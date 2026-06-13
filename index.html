@@ -61,6 +61,19 @@
   .status-tag{display:inline-block;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:600;background:#dcfce7;color:#166534}
   .status-tag.error{background:#fee2e2;color:#991b1b}
   @media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}.btn-row{flex-direction:column}}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:center;justify-content:center;padding:16px}
+  .modal-overlay.show{display:flex}
+  .modal-box{background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+  .modal-head{background:#25D366;color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-radius:16px 16px 0 0}
+  .modal-head h3{font-size:15px;font-weight:600}
+  .modal-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;padding:0}
+  .modal-body{padding:20px;overflow-y:auto;flex:1}
+  .wa-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px;font-size:13px;line-height:1.7;white-space:pre-wrap;font-family:inherit;color:#1a1a1a;max-height:340px;overflow-y:auto}
+  .modal-foot{padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;gap:10px}
+  .modal-foot button{flex:1;padding:11px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:none}
+  .btn-copy-wa{background:#25D366;color:#fff}
+  .btn-open-wa{background:#128C7E;color:#fff}
 </style>
 </head>
 <body>
@@ -125,7 +138,7 @@
     <button class="add-row-btn" onclick="addRow()">+ Add service</button>
 
     <div class="totals">
-      <div class="trow"><span>Subtotal</span><span id="ts">₹0</span></div>
+      <div class="trow"><span>Subtotal</span><span id="ts">Rs.0</span></div>
       <div class="trow"><span>Discount (₹)</span><input id="disc" type="number" value="0" min="0" onchange="calc()"/></div>
       <div class="trow">
         <span>GST (%)</span>
@@ -136,8 +149,8 @@
           <option value="18">18%</option>
         </select>
       </div>
-      <div class="trow"><span>GST amount</span><span id="tg">₹0</span></div>
-      <div class="trow grand"><span>Total amount</span><span id="tt">₹0</span></div>
+      <div class="trow"><span>GST amount</span><span id="tg">Rs.0</span></div>
+      <div class="trow grand"><span>Total amount</span><span id="tt">Rs.0</span></div>
       <div class="trow adv">
         <span>
           Advance required
@@ -147,7 +160,7 @@
             <option value="50">50%</option>
           </select>
         </span>
-        <span id="ta">₹0</span>
+        <span id="ta">Rs.0</span>
       </div>
     </div>
   </div>
@@ -168,7 +181,7 @@
   <!-- Action Buttons -->
   <div class="btn-row">
     <button class="btn btn-pre" onclick="showPrev()">👁 Preview</button>
-    <button class="btn btn-wa" onclick="openWA()">💬 WhatsApp</button>
+    <button class="btn btn-wa" onclick="showWA()">💬 WhatsApp</button>
     <button class="btn btn-pdf" onclick="makePDF()">⬇ Download PDF</button>
   </div>
 
@@ -270,7 +283,7 @@ function addRow(s = {s:'',d:'',q:1,r:0}){
     <td><input value="${s.d}" placeholder="Description"/></td>
     <td><input type="number" value="${s.q}" min="1" style="width:50px" onchange="calc()"/></td>
     <td><input type="number" value="${s.r}" min="0" onchange="calc()"/></td>
-    <td style="text-align:right;color:#666;font-size:13px;padding-right:8px" class="am">₹0</td>
+    <td style="text-align:right;color:#666;font-size:13px;padding-right:8px" class="am">Rs.0</td>
     <td><button class="del-btn" onclick="this.closest('tr').remove();calc()">×</button></td>`;
   tb.appendChild(tr);
   calc();
@@ -339,9 +352,7 @@ function showPrev(){
 }
 
 // ─── WHATSAPP ─────────────────────────────────────────────
-function openWA(){
-  const d = getData();
-  if(!d.cp){toast('WhatsApp number daalo!');return;}
+
   const sl = d.svcs.filter(s=>s.amt>0).map(s=>`  • ${s.s} (x${s.q}) — ₹${s.amt.toLocaleString('en-IN')}`).join('\n');
   const msg = `📄 *QUOTATION — S2DIO ERA*\n\nHi ${d.cn},\n\nThank you for reaching out! Your quotation:\n\n📍 *Location:* ${d.cl||'—'}\n📅 *Date:* ${d.cd||'—'}\n⏱ *Duration:* ${d.cdu||'—'}\n🎯 *Type:* ${d.ct||'—'}\n\n*Services:*\n${sl}${d.disc>0?`\n💸 Discount: ₹${d.disc.toLocaleString('en-IN')}`:''}\n${d.gp>0?`🧾 GST (${d.gp}%): ₹${d.ga.toLocaleString('en-IN')}`:''}${d.nt?`\n\n✨ *Includes:*\n${d.nt}`:''}\n\n━━━━━━━━━━━━\n💰 *TOTAL: ₹${d.tot.toLocaleString('en-IN')}*\n✅ *Advance (${d.ap}%): ₹${d.adv.toLocaleString('en-IN')}*\n━━━━━━━━━━━━\n\n📌 Advance confirms booking.\n📦 Deliverables as per agreed timeline.\n\n_Regards,_\n*S2DIO ERA*\n_Photography • Videography • Creative Production_\n_s2dioera.com_`;
   const num = d.cp.replace(/\D/g,'');
@@ -412,8 +423,8 @@ function makePDF(){
     doc.text(s.s||'',cols[0],y,{maxWidth:48});
     doc.text(s.d||'',cols[1],y,{maxWidth:44});
     doc.text(String(s.q),cols[2],y);
-    doc.text('₹'+s.rate.toLocaleString('en-IN'),cols[3],y);
-    doc.text('₹'+s.amt.toLocaleString('en-IN'),cols[4],y);
+    doc.text('Rs.'+s.rate.toLocaleString('en-IN'),cols[3],y);
+    doc.text('Rs.'+s.amt.toLocaleString('en-IN'),cols[4],y);
     y += 8;
   });
   y += 4;
@@ -422,8 +433,8 @@ function makePDF(){
   doc.line(M,y,W-M,y);y += 6;
   const totLines = [
     ['Subtotal','₹'+d.sub.toLocaleString('en-IN')],
-    ...(d.disc>0?[['Discount','-₹'+d.disc.toLocaleString('en-IN')]]:[]),
-    ...(d.gp>0?[['GST ('+d.gp+'%)','₹'+d.ga.toLocaleString('en-IN')]]:[]),
+    ...(d.disc>0?[['Discount','-Rs.'+d.disc.toLocaleString('en-IN')]]:[]),
+    ...(d.gp>0?[['GST ('+d.gp+'%)','Rs.'+d.ga.toLocaleString('en-IN')]]:[]),
   ];
   totLines.forEach(([l,v]) => {
     doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
@@ -431,7 +442,7 @@ function makePDF(){
   });
   doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(17,17,17);
   doc.text('TOTAL AMOUNT',W-M-65,y);
-  doc.text('₹'+d.tot.toLocaleString('en-IN'),W-M,y,{align:'right'});y+=7;
+  doc.text('Rs.'+d.tot.toLocaleString('en-IN'),W-M,y,{align:'right'});y+=7;
   doc.setFontSize(10);doc.setTextColor(5,150,105);
   doc.text(`Advance Required (${d.ap}%): ₹${d.adv.toLocaleString('en-IN')}`,W-M-80,y);
   y += 10;
@@ -519,6 +530,43 @@ async function saveQuotation(){
   }
 }
 
+
+function showWA(){
+  const d = getData();
+  const sl = d.svcs.filter(s=>s.s).map(s=>`  - ${s.s}${s.q>1?' (x'+s.q+')':''} -- Rs.${Math.round(s.amt).toLocaleString('en-IN')}`).join('\n');
+  let msg = `QUOTATION -- S2DIO ERA\n\nHi ${d.cn},\n\nThank you for reaching out! Here is your quotation:\n`;
+  msg += `\nLocation: ${d.cl||'--'}`;
+  msg += `\nShoot Date: ${d.cd||'--'}`;
+  if(d.cdu) msg += `\nDuration: ${d.cdu}`;
+  if(d.ct) msg += `\nType: ${d.ct}`;
+  msg += `\n\nServices:\n${sl}`;
+  if(d.disc>0) msg += `\n\nDiscount: Rs.${d.disc.toLocaleString('en-IN')}`;
+  if(d.gp>0) msg += `\nGST (${d.gp}%): Rs.${d.ga.toLocaleString('en-IN')}`;
+  if(d.nt) msg += `\n\nIncludes:\n${d.nt}`;
+  msg += `\n\n----------------------`;
+  msg += `\nTOTAL: Rs.${Math.round(d.tot).toLocaleString('en-IN')}`;
+  msg += `\nAdvance (${d.ap}%): Rs.${Math.round(d.adv).toLocaleString('en-IN')}`;
+  msg += `\n----------------------`;
+  msg += `\n\nAdvance payment required to confirm booking.`;
+  msg += `\nDeliverables as per mutually agreed timeline.`;
+  msg += `\n\nRegards,\nS2DIO ERA\nPhotography - Videography - Creative Production\ns2dioera.com`;
+  document.getElementById('wa-msg-box').textContent = msg;
+  document.getElementById('wa-modal').classList.add('show');
+}
+
+function copyWAMsg(){
+  const msg = document.getElementById('wa-msg-box').textContent;
+  navigator.clipboard.writeText(msg).then(()=>toast('Message copied! Paste in WhatsApp'));
+}
+
+function openWADirect(){
+  const d = getData();
+  if(!d.cp){toast('WhatsApp number daalo!');return;}
+  const msg = document.getElementById('wa-msg-box').textContent;
+  const num = d.cp.replace(/\D/g,'');
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
 // ─── TOAST ────────────────────────────────────────────────
 function toast(m){
   const t = document.getElementById('toast');
@@ -537,5 +585,23 @@ window.onload = () => {
   }
 };
 </script>
+
+<!-- WA Modal -->
+<div class="modal-overlay" id="wa-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>WhatsApp Message Ready</h3>
+      <button class="modal-close" onclick="document.getElementById('wa-modal').classList.remove('show')">x</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#666;margin-bottom:12px">Copy this message and paste in WhatsApp, or click Open WhatsApp to send directly:</p>
+      <div class="wa-box" id="wa-msg-box"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-copy-wa" onclick="copyWAMsg()">Copy Message</button>
+      <button class="btn-open-wa" onclick="openWADirect()">Open WhatsApp</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
