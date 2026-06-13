@@ -5,12 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>S2DIO ERA — CRM Tool</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- ═══ S2DIO CONFIG (settings.html se sync hota hai) ═══ -->
+<script>
+const S2DIO_CFG = (function(){
+  const K = k => 's2dio_cfg_' + k;
+  const L = k => { try { return JSON.parse(localStorage.getItem(K(k))); } catch { return null; } };
+  const D = {
+    cities:      ['Delhi NCR','Mumbai','Bangalore','Hyderabad','Chennai','Pune','Kolkata','Ahmedabad','Jaipur'],
+    areas:       ['South Delhi','North Delhi','West Delhi','East Delhi','Dwarka','Rohini','Noida','Greater Noida','Gurgaon','Faridabad','Ghaziabad'],
+    services:    ['Photography','Videography','Cinematography','Drone','Studio Booking','Reels','UGC Content'],
+    shoot_types: ['Wedding','Pre-Wedding','Corporate','Product Shoot','Fashion','Event','Web Series / Short Film','UGC (User Generated Content) Shoot','Real Estate','Food & Beverage','Portrait'],
+    budgets:     ['Rs.999/hr - Raw Footage','Rs.1,499 - Basic (1 Video + 15 Photos)','Rs.2,500 - Rs.5,000','Rs.5,000 - Rs.10,000','Rs.10,000 - Rs.25,000','Rs.25,000 - Rs.50,000','Rs.50,000+','Custom Budget'],
+    sources:     ['WhatsApp','Website','Instagram','Referral','Google','Walk-in','Other'],
+    statuses:    ['New','Contacted','Quoted','Booked'],
+    substatuses: ['Follow-up Pending','Call Done','No Response','Quote Sent','Advance Received'],
+    gst:         [0,5,12,18],
+    advance:     [30,40,50],
+    company:     {name:'S2DIO ERA',whatsapp:'',email:'',website:'s2dioera.com',gst:'',prepared_by:'',terms:''},
+    quotation:   {def_gst:18,def_advance:30}
+  };
+  return {
+    cities:      L('cities')      || D.cities,
+    areas:       L('areas')       || D.areas,
+    services:    L('services')    || D.services,
+    shoot_types: L('shoot_types') || D.shoot_types,
+    budgets:     L('budgets')     || D.budgets,
+    sources:     L('sources')     || D.sources,
+    statuses:    L('statuses')    || D.statuses,
+    substatuses: L('substatuses') || D.substatuses,
+    gst:         L('gst')         || D.gst,
+    advance:     L('advance')     || D.advance,
+    company:     L('company')     || D.company,
+    quotation:   L('quotation')   || D.quotation,
+  };
+})();
+</script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a;min-height:100vh}
 .topbar{background:#111;color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
 .topbar h1{font-size:16px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:16px}
 .topbar span{font-size:11px;color:#aaa}
+.settings-link{display:flex;align-items:center;gap:5px;color:#aaa;font-size:12px;font-weight:500;text-decoration:none;padding:6px 11px;border-radius:7px;border:1px solid #333;transition:all 0.15s}
+.settings-link:hover{background:#222;color:#fff;border-color:#555}
 .container{max-width:860px;margin:0 auto;padding:20px 16px 60px}
 .at-bar{background:#f0f7ff;border:1px solid #c8e0ff;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .at-bar label{font-size:13px;font-weight:600;color:#2563eb;white-space:nowrap}
@@ -99,7 +139,10 @@ table.sv input:focus{outline:none;border-color:#d0d0d0;background:#fff}
 
 <div class="topbar">
   <h1>S2DIO ERA — CRM Tool</h1>
-  <span>Team Internal Tool &nbsp;|&nbsp; s2dioera.com</span>
+  <div class="topbar-right">
+    <span>Team Internal Tool &nbsp;|&nbsp; s2dioera.com</span>
+    <a href="settings.html" class="settings-link">⚙ Settings</a>
+  </div>
 </div>
 
 <div class="container">
@@ -134,21 +177,10 @@ table.sv input:focus{outline:none;border-color:#d0d0d0;background:#fff}
         <div class="field"><label>WhatsApp number <span class="required">*</span></label><input id="i-cp" placeholder="+91 98765 43210"/></div>
         <div class="field"><label>Email</label><input id="i-ce" placeholder="client@email.com"/></div>
         <div class="field"><label>City <span class="required">*</span></label>
-          <select id="i-city">
-            <option value="">Select city</option>
-            <option>Delhi NCR</option><option>Mumbai</option><option>Bangalore</option>
-            <option>Hyderabad</option><option>Chennai</option><option>Pune</option>
-            <option>Kolkata</option><option>Ahmedabad</option><option>Jaipur</option>
-          </select>
+          <select id="i-city"><option value="">Select city</option></select>
         </div>
         <div class="field"><label>Area / Locality</label>
-          <select id="i-area">
-            <option value="">Select area</option>
-            <option>South Delhi</option><option>North Delhi</option><option>West Delhi</option>
-            <option>East Delhi</option><option>Dwarka</option><option>Rohini</option>
-            <option>Noida</option><option>Greater Noida</option><option>Gurgaon</option>
-            <option>Faridabad</option><option>Ghaziabad</option>
-          </select>
+          <select id="i-area"><option value="">Select area</option></select>
         </div>
         <div class="field"><label>Shoot date</label><input id="i-date" type="date"/></div>
       </div>
@@ -158,38 +190,14 @@ table.sv input:focus{outline:none;border-color:#d0d0d0;background:#fff}
       <div class="card-title">Shoot requirements</div>
       <div class="field" style="margin-bottom:12px">
         <label>Service needed (multiple select karein)</label>
-        <div class="chips-wrap" id="svc-chips">
-          <span class="chip unsel" onclick="toggleChip(this)">Photography</span>
-          <span class="chip unsel" onclick="toggleChip(this)">Videography</span>
-          <span class="chip unsel" onclick="toggleChip(this)">Cinematography</span>
-          <span class="chip unsel" onclick="toggleChip(this)">Drone</span>
-          <span class="chip unsel" onclick="toggleChip(this)">Studio Booking</span>
-          <span class="chip unsel" onclick="toggleChip(this)">Reels</span>
-          <span class="chip unsel" onclick="toggleChip(this)">UGC Content</span>
-        </div>
+        <div class="chips-wrap" id="svc-chips"></div>
       </div>
       <div class="grid2">
         <div class="field"><label>Shoot type</label>
-          <select id="i-stype">
-            <option value="">Select type</option>
-            <option>Wedding</option><option>Pre-Wedding</option><option>Corporate</option>
-            <option>Product Shoot</option><option>Fashion</option><option>Event</option>
-            <option>Web Series / Short Film</option><option>UGC (User Generated Content) Shoot</option>
-            <option>Real Estate</option><option>Food & Beverage</option><option>Portrait</option>
-          </select>
+          <select id="i-stype"><option value="">Select type</option></select>
         </div>
         <div class="field"><label>Budget range</label>
-          <select id="i-budget">
-            <option value="">Select budget</option>
-            <option>Rs.999/hr - Raw Footage</option>
-            <option>Rs.1,499 - Basic (1 Video + 15 Photos)</option>
-            <option>Rs.2,500 - Rs.5,000</option>
-            <option>Rs.5,000 - Rs.10,000</option>
-            <option>Rs.10,000 - Rs.25,000</option>
-            <option>Rs.25,000 - Rs.50,000</option>
-            <option>Rs.50,000+</option>
-            <option>Custom Budget</option>
-          </select>
+          <select id="i-budget"><option value="">Select budget</option></select>
         </div>
       </div>
       <div class="field" style="margin-top:12px">
@@ -202,28 +210,13 @@ table.sv input:focus{outline:none;border-color:#d0d0d0;background:#fff}
       <div class="card-title">Lead info (internal)</div>
       <div class="grid3">
         <div class="field"><label>Lead source</label>
-          <select id="i-src">
-            <option value="">Select source</option>
-            <option>WhatsApp</option><option>Website</option><option>Instagram</option>
-            <option>Referral</option><option>Google</option><option>Walk-in</option><option>Other</option>
-          </select>
+          <select id="i-src"><option value="">Select source</option></select>
         </div>
         <div class="field"><label>Status</label>
-          <select id="i-status">
-            <option value="New">New</option>
-            <option value="Contacted">Contacted</option>
-            <option value="Quoted">Quoted</option>
-            <option value="Booked">Booked</option>
-          </select>
+          <select id="i-status"></select>
         </div>
         <div class="field"><label>Substatus</label>
-          <select id="i-sub">
-            <option value="Follow-up Pending">Follow-up Pending</option>
-            <option value="Call Done">Call Done</option>
-            <option value="No Response">No Response</option>
-            <option value="Quote Sent">Quote Sent</option>
-            <option value="Advance Received">Advance Received</option>
-          </select>
+          <select id="i-sub"></select>
         </div>
       </div>
     </div>
@@ -285,16 +278,14 @@ table.sv input:focus{outline:none;border-color:#d0d0d0;background:#fff}
       <div class="totals">
         <div class="trow"><span>Subtotal</span><span id="ts">Rs.0</span></div>
         <div class="trow"><span>Discount (Rs.)</span><input id="disc" type="number" value="0" min="0" onchange="calc()"/></div>
-        <div class="trow"><span>GST (%)</span>
-          <select id="gst" onchange="calc()">
-            <option value="0">0%</option><option value="5">5%</option>
-            <option value="12">12%</option><option value="18">18%</option>
-          </select>
+        <div class="trow">
+          <span>GST (%)</span>
+          <select id="gst" onchange="calc()"></select>
         </div>
         <div class="trow"><span>GST amount</span><span id="tg">Rs.0</span></div>
         <div class="trow grand"><span>Total amount</span><span id="tt">Rs.0</span></div>
         <div class="trow adv">
-          <span>Advance &nbsp;<select id="advp" onchange="calc()" style="font-size:13px;border:1px solid #d0d0d0;border-radius:6px;padding:3px 6px;font-weight:600;color:#059669"><option value="30">30%</option><option value="40">40%</option><option value="50">50%</option></select></span>
+          <span>Advance &nbsp;<select id="advp" onchange="calc()" style="font-size:13px;border:1px solid #d0d0d0;border-radius:6px;padding:3px 6px;font-weight:600;color:#059669"></select></span>
           <span id="ta">Rs.0</span>
         </div>
       </div>
@@ -349,6 +340,68 @@ table.sv input:focus{outline:none;border-color:#d0d0d0;background:#fff}
 const BASE = 'appfJtOaBCSpLQ1GN';
 const LEADS = 'Client Leads';
 const QUOTS = 'Quotation';
+
+// ─── POPULATE DROPDOWNS FROM CONFIG ─────────────────────
+function fillSelect(id, items, placeholder){
+  const sel = document.getElementById(id);
+  sel.innerHTML = placeholder ? `<option value="">${placeholder}</option>` : '';
+  items.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    sel.appendChild(o);
+  });
+}
+
+function initDropdowns(){
+  const cfg = S2DIO_CFG;
+
+  // Inquiry tab
+  fillSelect('i-city',   cfg.cities,      'Select city');
+  fillSelect('i-area',   cfg.areas,       'Select area');
+  fillSelect('i-stype',  cfg.shoot_types, 'Select type');
+  fillSelect('i-budget', cfg.budgets,     'Select budget');
+  fillSelect('i-src',    cfg.sources,     'Select source');
+
+  // Statuses (no blank placeholder - these always have a value)
+  fillSelect('i-status',  cfg.statuses,    null);
+  fillSelect('i-sub',     cfg.substatuses, null);
+
+  // Services chips
+  const wrap = document.getElementById('svc-chips');
+  wrap.innerHTML = '';
+  cfg.services.forEach(svc => {
+    const span = document.createElement('span');
+    span.className = 'chip unsel';
+    span.textContent = svc;
+    span.onclick = function(){ toggleChip(this); };
+    wrap.appendChild(span);
+  });
+
+  // GST options
+  const gstSel = document.getElementById('gst');
+  gstSel.innerHTML = '';
+  cfg.gst.forEach(g => {
+    const o = document.createElement('option');
+    o.value = g; o.textContent = g + '%';
+    if(g === cfg.quotation.def_gst) o.selected = true;
+    gstSel.appendChild(o);
+  });
+
+  // Advance options
+  const advSel = document.getElementById('advp');
+  advSel.innerHTML = '';
+  cfg.advance.forEach(a => {
+    const o = document.createElement('option');
+    o.value = a; o.textContent = a + '%';
+    if(a === cfg.quotation.def_advance) o.selected = true;
+    advSel.appendChild(o);
+  });
+
+  // Pre-fill prepared by from company config
+  if(cfg.company && cfg.company.prepared_by){
+    document.getElementById('pb').value = cfg.company.prepared_by;
+  }
+}
 
 // ─── TABS ──────────────────────────────
 function switchTab(t){
@@ -453,7 +506,6 @@ async function saveInquiry(){
   };
   if(document.getElementById('i-date').value) fields['Shoot Date']=document.getElementById('i-date').value;
   if(svcs.length>0) fields['Service Needed']=svcs;
-  // Remove undefined
   Object.keys(fields).forEach(k=>fields[k]===undefined&&delete fields[k]);
   try{
     const r=await fetch(`https://api.airtable.com/v0/${BASE}/${encodeURIComponent(LEADS)}`,{
@@ -465,7 +517,6 @@ async function saveInquiry(){
     if(data.error){toast('Error: '+data.error.message);return;}
     document.getElementById('inq-success').classList.add('show');
     toast('Lead saved to Airtable!');
-    // Refresh leads list
     loadLeads(token);
     setTimeout(()=>document.getElementById('inq-success').classList.remove('show'),4000);
   }catch(e){toast('Connection error!');}
@@ -475,14 +526,13 @@ function clearInquiry(){
   ['i-cn','i-cp','i-ce','i-req'].forEach(id=>document.getElementById(id).value='');
   ['i-city','i-area','i-stype','i-budget','i-src'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('i-date').value='';
-  document.getElementById('i-status').value='New';
-  document.getElementById('i-sub').value='Follow-up Pending';
+  document.getElementById('i-status').selectedIndex=0;
+  document.getElementById('i-sub').selectedIndex=0;
   document.querySelectorAll('#svc-chips .chip').forEach(c=>{c.classList.remove('sel');c.classList.add('unsel');});
   toast('Form cleared!');
 }
 
 function goToQuotation(){
-  // Copy inquiry data to quotation tab
   const cn=document.getElementById('i-cn').value;
   const cp=document.getElementById('i-cp').value;
   const ce=document.getElementById('i-ce').value;
@@ -498,7 +548,6 @@ function goToQuotation(){
   if(stype) document.getElementById('ct').value=stype;
   if(date) document.getElementById('cd').value=date;
   if(req&&req.length>3) document.getElementById('nt').value=req;
-  // Switch tab
   document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.tab')[1].classList.add('active');
@@ -585,8 +634,9 @@ function showPrev(){
 // ─── WHATSAPP ──────────────────────────
 function showWA(){
   const d=getData();
+  const co=S2DIO_CFG.company;
   const sl=d.svcs.filter(s=>s.s).map(s=>`  - ${s.s}${s.q>1?' (x'+s.q+')':''} -- Rs.${Math.round(s.amt).toLocaleString('en-IN')}`).join('\n');
-  let msg=`QUOTATION -- S2DIO ERA\n\nHi ${d.cn},\n\nThank you for reaching out! Your quotation:\n`;
+  let msg=`QUOTATION -- ${co.name||'S2DIO ERA'}\n\nHi ${d.cn},\n\nThank you for reaching out! Your quotation:\n`;
   msg+=`\nLocation: ${d.cl||'--'}`;
   msg+=`\nShoot Date: ${d.cd||'--'}`;
   if(d.cdu) msg+=`\nDuration: ${d.cdu}`;
@@ -599,7 +649,7 @@ function showWA(){
   msg+=`\nTOTAL: Rs.${Math.round(d.tot).toLocaleString('en-IN')}`;
   msg+=`\nAdvance (${d.ap}%): Rs.${Math.round(d.adv).toLocaleString('en-IN')}`;
   msg+=`\n----------------------`;
-  msg+=`\n\nAdvance confirms booking.\nDeliverables as per agreed timeline.\n\nRegards,\nS2DIO ERA\nPhotography - Videography - Creative Production\ns2dioera.com`;
+  msg+=`\n\nAdvance confirms booking.\nDeliverables as per agreed timeline.\n\nRegards,\n${co.name||'S2DIO ERA'}\nPhotography - Videography - Creative Production\n${co.website||'s2dioera.com'}`;
   document.getElementById('wa-msg-box').textContent=msg;
   document.getElementById('wa-modal').classList.add('show');
 }
@@ -619,18 +669,19 @@ function makePDF(){
   if(typeof window.jspdf==='undefined'){toast('PDF loading... dobara try karo');return;}
   const{jsPDF}=window.jspdf;
   const d=getData();
+  const co=S2DIO_CFG.company;
+  const bizName=co.name||'S2DIO ERA';
+  const website=co.website||'s2dioera.com';
   const doc=new jsPDF({unit:'mm',format:'a4'});
   const W=210,M=18;let y=0;
-  // Header
   doc.setFillColor(17,17,17);doc.rect(0,0,W,22,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(15);doc.setFont('helvetica','bold');
-  doc.text('S2DIO ERA',M,13);
+  doc.text(bizName,M,13);
   doc.setFontSize(8);doc.setFont('helvetica','normal');
   doc.text('Photography  |  Videography  |  Creative Production',M,18);
-  doc.text('s2dioera.com',W-M,13,{align:'right'});
+  doc.text(website,W-M,13,{align:'right'});
   doc.text('Search. Select. Shoot.',W-M,18,{align:'right'});
   y=32;
-  // Title
   doc.setTextColor(17,17,17);doc.setFontSize(24);doc.setFont('helvetica','bold');
   doc.text('QUOTATION',M,y);
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
@@ -639,7 +690,6 @@ function makePDF(){
   if(d.ct){doc.setFontSize(11);doc.setTextColor(80,80,80);doc.setFont('helvetica','italic');doc.text(d.ct,M,y);}
   y+=10;
   doc.setDrawColor(220,220,220);doc.setLineWidth(0.3);doc.line(M,y,W-M,y);y+=8;
-  // Client box
   doc.setFillColor(249,249,249);doc.roundedRect(M,y-2,W-2*M,26,3,3,'F');
   doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(140,140,140);
   doc.text('CLIENT DETAILS',M+4,y+3);y+=7;
@@ -648,7 +698,6 @@ function makePDF(){
     doc.text(row[0],M+4,y);doc.text(row[1],W/2+2,y);y+=5.5;
   });
   y+=6;
-  // Services header
   doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(140,140,140);
   doc.text('SERVICES',M,y);y+=5;
   const cols=[M,M+50,M+100,M+122,M+152];
@@ -671,23 +720,34 @@ function makePDF(){
   doc.line(M,y,W-M,y);y+=6;
   if(d.disc>0){doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);doc.text('Subtotal',W-M-65,y);doc.text('Rs.'+Math.round(d.sub).toLocaleString('en-IN'),W-M,y,{align:'right'});y+=5;doc.text('Discount',W-M-65,y);doc.text('-Rs.'+Math.round(d.disc).toLocaleString('en-IN'),W-M,y,{align:'right'});y+=5;}
   if(d.gp>0){doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);doc.text('GST ('+d.gp+'%)',W-M-65,y);doc.text('Rs.'+d.ga.toLocaleString('en-IN'),W-M,y,{align:'right'});y+=5;}
-  // Total box
   doc.setFillColor(17,17,17);doc.roundedRect(M,y-2,W-2*M,12,2,2,'F');
   doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
   doc.text('TOTAL AMOUNT',M+4,y+6);doc.text('Rs. '+Math.round(d.tot).toLocaleString('en-IN'),W-M-4,y+6,{align:'right'});y+=16;
-  // Advance box
   doc.setFillColor(236,253,245);doc.roundedRect(M,y-2,W-2*M,10,2,2,'F');
   doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(5,120,70);
   doc.text('Advance Required ('+d.ap+'%)',M+4,y+5);doc.text('Rs. '+Math.round(d.adv).toLocaleString('en-IN'),W-M-4,y+5,{align:'right'});y+=14;
   if(d.nt){doc.line(M,y,W-M,y);y+=5;doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(140,140,140);doc.text('SERVICES INCLUDED / NOTES',M,y);y+=5;doc.setFont('helvetica','normal');doc.setTextColor(50,50,50);doc.setFontSize(9);const lines=doc.splitTextToSize(d.nt,W-2*M);doc.text(lines,M,y);y+=lines.length*4.5+4;}
+  // Terms — use custom terms from company config if set
+  const customTerms = co.terms ? co.terms.split('\n').filter(Boolean) : [];
+  const defaultTerms = [
+    d.ap+'% advance required to confirm booking.',
+    'Remaining amount payable on/before shoot day.',
+    'Deliverables within mutually agreed timeline.',
+    'Raw data handed over after full payment.',
+    'Cancellation: advance non-refundable within 48 hrs.',
+    ...(d.vu?['Valid until: '+d.vu]:[]),
+    ...(d.pb?['Prepared by: '+d.pb]:[])
+  ];
+  const terms = customTerms.length > 0 ? customTerms : defaultTerms;
   doc.line(M,y,W-M,y);y+=5;
   doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(140,140,140);doc.text('TERMS & CONDITIONS',M,y);y+=5;
   doc.setFont('helvetica','normal');doc.setTextColor(100,100,100);
-  [d.ap+'% advance required to confirm booking.','Remaining amount payable on/before shoot day.','Deliverables within mutually agreed timeline.','Raw data handed over after full payment.','Cancellation: advance non-refundable within 48 hrs.',...(d.vu?['Valid until: '+d.vu]:[]),...(d.pb?['Prepared by: '+d.pb]:[])].forEach(t=>{doc.text('- '+t,M,y);y+=4.5;});
-  // Footer
+  terms.forEach(t=>{doc.text('- '+t,M,y);y+=4.5;});
+  // GST number on PDF if set
+  if(co.gst){doc.setFontSize(8);doc.text('GST No: '+co.gst,M,y);y+=5;}
   doc.setFillColor(245,245,245);doc.rect(0,282,W,15,'F');
   doc.setFontSize(8);doc.setTextColor(130,130,130);
-  doc.text('S2DIO ERA  |  Instant Studio & Creator Booking Platform  |  s2dioera.com',W/2,289,{align:'center'});
+  doc.text(`${bizName}  |  Instant Studio & Creator Booking Platform  |  ${website}`,W/2,289,{align:'center'});
   doc.text('Photography  |  Videography  |  Creative Production  |  Drone  |  Studio Booking',W/2,294,{align:'center'});
   doc.save('S2DIO-Quotation-'+d.cn.replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.pdf');
   toast('PDF downloaded!');
@@ -726,6 +786,7 @@ function toast(m){
 
 // ─── INIT ──────────────────────────────
 window.onload=()=>{
+  initDropdowns();
   defs.forEach(s=>addRow(s));
   const saved=getToken();
   if(saved){

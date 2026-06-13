@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>S2DIO ERA — Settings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0C0C0E;
+      --surface:   #141418;
+      --surface2:  #1C1C22;
+      --border:    #2A2A33;
+      --accent:    #F5A623;
+      --accent2:   #FF6B35;
+      --text:      #EEEEF0;
+      --muted:     #7A7A8C;
+      --success:   #22C55E;
+      --danger:    #EF4444;
+      --radius:    10px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      padding: 22px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo .brand { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; }
+    .sidebar-logo .page-title { font-size: 18px; font-weight: 800; color: var(--text); margin-top: 2px; }
+
+    .sidebar-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+    .nav-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 12px 4px; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px;
+      cursor: pointer; font-size: 13.5px; font-weight: 500;
+      color: var(--muted); transition: all 0.15s; margin-bottom: 1px;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: rgba(245,166,35,0.12); color: var(--accent); }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-badge { margin-left: auto; background: var(--surface2); color: var(--muted);
+      font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 20px; }
+    .nav-item.active .nav-badge { background: rgba(245,166,35,0.2); color: var(--accent); }
+
+    .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+    .back-link {
+      display: flex; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 13px; font-weight: 500;
+      text-decoration: none; padding: 8px 12px; border-radius: 8px;
+      transition: all 0.15s;
+    }
+    .back-link:hover { background: var(--surface2); color: var(--text); }
+
+    /* ── Main ── */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      padding: 32px 40px;
+      max-width: 860px;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .page-header h1 { font-size: 26px; font-weight: 800; }
+    .page-header p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+    /* ── Section ── */
+    .section {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .section.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-title { display: flex; align-items: center; gap: 10px; }
+    .section-title .emoji { font-size: 22px; }
+    .section-title h2 { font-size: 18px; font-weight: 700; }
+    .section-title p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+
+    /* ── Tag list ── */
+    .tag-list { display: flex; flex-wrap: wrap; gap: 8px; min-height: 32px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-size: 13px; font-weight: 500;
+      padding: 5px 10px 5px 12px; border-radius: 20px;
+      transition: border-color 0.15s;
+    }
+    .tag:hover { border-color: var(--muted); }
+    .tag-del {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 14px; line-height: 1;
+      padding: 0 1px; border-radius: 50%;
+      transition: color 0.15s;
+    }
+    .tag-del:hover { color: var(--danger); }
+    .tag-empty { color: var(--muted); font-size: 13px; font-style: italic; }
+
+    /* ── Add row ── */
+    .add-row { display: flex; gap: 8px; margin-top: 14px; }
+    .add-row input, .add-row select {
+      flex: 1; background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Inter', sans-serif;
+      font-size: 13px; padding: 9px 13px; border-radius: 8px;
+      outline: none; transition: border-color 0.15s;
+    }
+    .add-row input:focus, .add-row select:focus { border-color: var(--accent); }
+    .add-row input::placeholder { color: var(--muted); }
+
+    .btn {
+      padding: 9px 16px; border-radius: 8px; border: none;
+      font-family: 'Inter', sans-serif; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #0C0C0E; }
+    .btn-primary:hover { background: #E09820; }
+    .btn-danger { background: rgba(239,68,68,0.12); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+    .btn-danger:hover { background: rgba(239,68,68,0.2); }
+    .btn-ghost { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+    .btn-success { background: rgba(34,197,94,0.12); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
+    .btn-success:hover { background: rgba(34,197,94,0.2); }
+
+    /* ── Company form ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-field.full { grid-column: 1 / -1; }
+    .form-field label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .form-field input, .form-field textarea, .form-field select {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Inter', sans-serif;
+      font-size: 13.5px; padding: 10px 13px; border-radius: 8px;
+      outline: none; transition: border-color 0.15s;
+    }
+    .form-field input:focus, .form-field textarea:focus, .form-field select:focus { border-color: var(--accent); }
+    .form-field textarea { resize: vertical; min-height: 80px; }
+    .form-save-row { margin-top: 16px; display: flex; gap: 10px; align-items: center; }
+
+    /* ── Quotation settings ── */
+    .option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 14px; }
+    .option-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px;
+      font-size: 13px; font-weight: 500;
+    }
+    .option-item .opt-del { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 14px; transition: color 0.15s; }
+    .option-item .opt-del:hover { color: var(--danger); }
+
+    /* ── Danger zone ── */
+    .danger-zone { border-color: rgba(239,68,68,0.25); }
+    .danger-zone .card-label { color: var(--danger); }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--success); color: #fff;
+      font-size: 13.5px; font-weight: 600;
+      padding: 12px 20px; border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 999; pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.error { background: var(--danger); }
+
+    /* ── Header actions ── */
+    .header-actions { display: flex; gap: 8px; }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; min-height: auto; position: static; flex-direction: row; flex-wrap: wrap; }
+      .main { margin-left: 0; padding: 20px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">S2DIO ERA</div>
+    <div class="page-title">Settings</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">General</div>
+    <div class="nav-item active" onclick="showSection('company')" id="nav-company">
+      <span class="icon">🏢</span> Company Info
+    </div>
+
+    <div class="nav-label" style="margin-top:8px">Lead Form</div>
+    <div class="nav-item" onclick="showSection('cities')" id="nav-cities">
+      <span class="icon">🌆</span> Cities
+      <span class="nav-badge" id="badge-cities">0</span>
+    </div>
+    <div class="nav-item" onclick="showSection('areas')" id="nav-areas">
+      <span class="icon">📍</span> Areas
+      <span class="nav-badge" id="badge-areas">0</span>
+    </div>
+    <div class="nav-item" onclick="showSection('services')" id="nav-services">
+      <span class="icon">🎯</span> Services
+      <span class="nav-badge" id="badge-services">0</span>
+    </div>
+    <div class="nav-item" onclick="showSection('shoot_types')" id="nav-shoot_types">
+      <span class="icon">🎬</span> Shoot Types
+      <span class="nav-badge" id="badge-shoot_types">0</span>
+    </div>
+    <div class="nav-item" onclick="showSection('budgets')" id="nav-budgets">
+      <span class="icon">💰</span> Budget Ranges
+      <span class="nav-badge" id="badge-budgets">0</span>
+    </div>
+
+    <div class="nav-label" style="margin-top:8px">Pipeline</div>
+    <div class="nav-item" onclick="showSection('sources')" id="nav-sources">
+      <span class="icon">📊</span> Lead Sources
+      <span class="nav-badge" id="badge-sources">0</span>
+    </div>
+    <div class="nav-item" onclick="showSection('statuses')" id="nav-statuses">
+      <span class="icon">🔖</span> Statuses
+      <span class="nav-badge" id="badge-statuses">0</span>
+    </div>
+    <div class="nav-item" onclick="showSection('substatuses')" id="nav-substatuses">
+      <span class="icon">🏷️</span> Sub-statuses
+      <span class="nav-badge" id="badge-substatuses">0</span>
+    </div>
+
+    <div class="nav-label" style="margin-top:8px">Quotation</div>
+    <div class="nav-item" onclick="showSection('quotation')" id="nav-quotation">
+      <span class="icon">📄</span> Quotation Settings
+    </div>
+
+    <div class="nav-label" style="margin-top:8px">Data</div>
+    <div class="nav-item" onclick="showSection('data')" id="nav-data">
+      <span class="icon">💾</span> Export / Import
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="index.html" class="back-link">← Back to CRM Tool</a>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════ MAIN ═══════════════════════════════ -->
+<main class="main">
+
+  <!-- ── COMPANY INFO ── -->
+  <div class="section active" id="section-company">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">🏢</span>
+        <div>
+          <h2>Company Info</h2>
+          <p>Quotation mein dikhne wali details</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="form-grid" id="company-form">
+        <div class="form-field">
+          <label>Business Name</label>
+          <input type="text" id="co_name" placeholder="S2DIO ERA" />
+        </div>
+        <div class="form-field">
+          <label>WhatsApp Number</label>
+          <input type="text" id="co_whatsapp" placeholder="+91 98765 43210" />
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" id="co_email" placeholder="hello@s2dioera.com" />
+        </div>
+        <div class="form-field">
+          <label>Website</label>
+          <input type="text" id="co_website" placeholder="s2dioera.com" />
+        </div>
+        <div class="form-field">
+          <label>GST Number</label>
+          <input type="text" id="co_gst" placeholder="22AAAAA0000A1Z5" />
+        </div>
+        <div class="form-field">
+          <label>Default "Prepared By"</label>
+          <input type="text" id="co_prepared_by" placeholder="Sales Team" />
+        </div>
+        <div class="form-field full">
+          <label>Quotation Footer / Terms (optional)</label>
+          <textarea id="co_terms" placeholder="Payment terms, cancellation policy, etc."></textarea>
+        </div>
+      </div>
+      <div class="form-save-row">
+        <button class="btn btn-primary" onclick="saveCompany()">Save Company Info</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CITIES ── -->
+  <div class="section" id="section-cities">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">🌆</span>
+        <div><h2>Cities</h2><p>Jahan aap operate karte ho</p></div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetToDefault('cities')">Reset to default</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Current Cities</div>
+      <div class="tag-list" id="tags-cities"></div>
+      <div class="add-row">
+        <input type="text" id="input-cities" placeholder="City name likhein... (Enter press karein)" onkeydown="handleEnter(event,'cities')" />
+        <button class="btn btn-primary" onclick="addItem('cities')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AREAS ── -->
+  <div class="section" id="section-areas">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">📍</span>
+        <div><h2>Areas / Localities</h2><p>Specific areas aur localities</p></div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetToDefault('areas')">Reset to default</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Current Areas</div>
+      <div class="tag-list" id="tags-areas"></div>
+      <div class="add-row">
+        <input type="text" id="input-areas" placeholder="Area/locality name likhein... (Enter press karein)" onkeydown="handleEnter(event,'areas')" />
+        <button class="btn btn-primary" onclick="addItem('areas')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SERVICES ── -->
+  <div class="section" id="section-services">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">🎯</span>
+        <div><h2>Services</h2><p>Jo services aap offer karte ho</p></div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetToDefault('services')">Reset to default</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Current Services</div>
+      <div class="tag-list" id="tags-services"></div>
+      <div class="add-row">
+        <input type="text" id="input-services" placeholder="Service name likhein... (Enter press karein)" onkeydown="handleEnter(event,'services')" />
+        <button class="btn btn-primary" onclick="addItem('services')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SHOOT TYPES ── -->
+  <div class="section" id="section-shoot_types">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">🎬</span>
+        <div><h2>Shoot Types</h2><p>Shoot ke categories</p></div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetToDefault('shoot_types')">Reset to default</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Current Shoot Types</div>
+      <div class="tag-list" id="tags-shoot_types"></div>
+      <div class="add-row">
+        <input type="text" id="input-shoot_types" placeholder="Shoot type likhein... (Enter press karein)" onkeydown="handleEnter(event,'shoot_types')" />
+        <button class="btn btn-primary" onclick="addItem('shoot_types')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BUDGET RANGES ── -->
+  <div class="section" id="section-budgets">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">💰</span>
+        <div><h2>Budget Ranges</h2><p>Client ke liye budget options</p></div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetToDefault('budgets')">Reset to default</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Current Budget Ranges</div>
+      <div class="tag-list" id="tags-budgets"></div>
+      <div class="add-row">
+        <input type="text" id="input-budgets" placeholder="e.g. Rs.5,000 - Rs.10,000  (Enter press karein)" onkeydown="handleEnter(event,'budgets')" />
+        <button class="btn btn-primary" onclick="addItem('budgets')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LEAD SOURCES ── -->
+  <div class="section" id="section-sources">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">📊</span>
+        <div><h2>Lead Sources</h2><p>Kahan se lead aata hai</p></div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetToDefault('sources')">Reset to default</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Current Sources</div>
+      <div class="tag-list" id="tags-sources"></div>
+      <div class="add-row">
+        <input type="text" id="input-sources" placeholder="Source likhein... (Enter press karein)" onkeydown="handleEnter(event,'sources')" />
+        <button class="btn btn-primary" onclick="addItem('sources')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STATUSES ── -->
+  <div class="section" id="section-statuses">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">🔖</span>
+        <div><h2>Lead Statuses</h2><p>Lead ka main status</p></div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetToDefault('statuses')">Reset to default</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Current Statuses</div>
+      <div class="tag-list" id="tags-statuses"></div>
+      <div class="add-row">
+        <input type="text" id="input-statuses" placeholder="Status likhein... (Enter press karein)" onkeydown="handleEnter(event,'statuses')" />
+        <button class="btn btn-primary" onclick="addItem('statuses')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUB-STATUSES ── -->
+  <div class="section" id="section-substatuses">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">🏷️</span>
+        <div><h2>Sub-statuses</h2><p>Lead ka detailed substatus</p></div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetToDefault('substatuses')">Reset to default</button>
+    </div>
+    <div class="card">
+      <div class="card-label">Current Sub-statuses</div>
+      <div class="tag-list" id="tags-substatuses"></div>
+      <div class="add-row">
+        <input type="text" id="input-substatuses" placeholder="Sub-status likhein... (Enter press karein)" onkeydown="handleEnter(event,'substatuses')" />
+        <button class="btn btn-primary" onclick="addItem('substatuses')">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── QUOTATION SETTINGS ── -->
+  <div class="section" id="section-quotation">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">📄</span>
+        <div><h2>Quotation Settings</h2><p>GST % aur advance % options</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">GST Options (%)</div>
+      <div class="option-grid" id="opts-gst"></div>
+      <div class="add-row">
+        <input type="number" id="input-gst" placeholder="GST % likhein (e.g. 28)" min="0" max="100" onkeydown="handleEnter(event,'gst')" />
+        <button class="btn btn-primary" onclick="addOption('gst')">+ Add %</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Advance Options (%)</div>
+      <div class="option-grid" id="opts-advance"></div>
+      <div class="add-row">
+        <input type="number" id="input-advance" placeholder="Advance % likhein (e.g. 25)" min="0" max="100" onkeydown="handleEnter(event,'advance')" />
+        <button class="btn btn-primary" onclick="addOption('advance')">+ Add %</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Defaults</div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Default GST %</label>
+          <select id="def_gst"></select>
+        </div>
+        <div class="form-field">
+          <label>Default Advance %</label>
+          <select id="def_advance"></select>
+        </div>
+      </div>
+      <div class="form-save-row">
+        <button class="btn btn-primary" onclick="saveQuotation()">Save Quotation Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EXPORT / IMPORT ── -->
+  <div class="section" id="section-data">
+    <div class="section-header">
+      <div class="section-title">
+        <span class="emoji">💾</span>
+        <div><h2>Export / Import</h2><p>Backup lena ya dusre device mein copy karna</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Export Config</div>
+      <p style="color:var(--muted);font-size:13.5px;margin-bottom:14px">Saari settings ek JSON file mein export karo — backup ke liye ya share karne ke liye.</p>
+      <button class="btn btn-success" onclick="exportConfig()">⬇ Download Config JSON</button>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Import Config</div>
+      <p style="color:var(--muted);font-size:13.5px;margin-bottom:14px">Pehle export ki hui JSON file upload karo — <strong style="color:var(--text)">existing settings replace ho jayengi.</strong></p>
+      <div class="add-row">
+        <input type="file" id="import-file" accept=".json" style="flex:1;padding:7px 0;background:none;border:none;color:var(--text)" />
+        <button class="btn btn-primary" onclick="importConfig()">⬆ Import</button>
+      </div>
+    </div>
+
+    <div class="card danger-zone" style="border-color:rgba(239,68,68,0.3)">
+      <div class="card-label" style="color:var(--danger)">⚠️ Danger Zone</div>
+      <p style="color:var(--muted);font-size:13.5px;margin-bottom:14px">Saari settings delete karke default par wapas le jao. Ye action undo nahi hogi.</p>
+      <button class="btn btn-danger" onclick="resetAll()">🗑 Reset All Settings to Default</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div id="toast">✓ Saved</div>
+
+<script>
+// ══════════════════════════════════════════════
+//   DEFAULT VALUES
+// ══════════════════════════════════════════════
+const DEFAULTS = {
+  cities: ['Delhi NCR','Mumbai','Bangalore','Hyderabad','Chennai','Pune','Kolkata','Ahmedabad','Jaipur'],
+  areas: ['South Delhi','North Delhi','West Delhi','East Delhi','Dwarka','Rohini','Noida','Greater Noida','Gurgaon','Faridabad','Ghaziabad'],
+  services: ['Photography','Videography','Cinematography','Drone','Studio Booking','Reels','UGC Content'],
+  shoot_types: ['Wedding','Pre-Wedding','Corporate','Product Shoot','Fashion','Event','Web Series / Short Film','UGC (User Generated Content) Shoot','Real Estate','Food & Beverage','Portrait'],
+  budgets: ['Rs.999/hr - Raw Footage','Rs.1,499 - Basic (1 Video + 15 Photos)','Rs.2,500 - Rs.5,000','Rs.5,000 - Rs.10,000','Rs.10,000 - Rs.25,000','Rs.25,000 - Rs.50,000','Rs.50,000+','Custom Budget'],
+  sources: ['WhatsApp','Website','Instagram','Referral','Google','Walk-in','Other'],
+  statuses: ['New','Contacted','Quoted','Booked'],
+  substatuses: ['Follow-up Pending','Call Done','No Response','Quote Sent','Advance Received'],
+  gst: [0, 5, 12, 18],
+  advance: [30, 40, 50],
+  company: { name:'S2DIO ERA', whatsapp:'', email:'', website:'s2dioera.com', gst:'', prepared_by:'Sales Team', terms:'' },
+  quotation: { def_gst: 18, def_advance: 30 }
+};
+
+const KEY = k => 's2dio_cfg_' + k;
+
+// ══════════════════════════════════════════════
+//   LOAD / SAVE
+// ══════════════════════════════════════════════
+function load(k) {
+  try { return JSON.parse(localStorage.getItem(KEY(k))); } catch { return null; }
+}
+function save(k, v) {
+  localStorage.setItem(KEY(k), JSON.stringify(v));
+}
+function getList(k) { return load(k) || [...DEFAULTS[k]]; }
+function getGST()     { return load('gst')     || [...DEFAULTS.gst]; }
+function getAdvance() { return load('advance') || [...DEFAULTS.advance]; }
+
+// ══════════════════════════════════════════════
+//   NAVIGATION
+// ══════════════════════════════════════════════
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+  if (id === 'quotation') renderQuotation();
+}
+
+// ══════════════════════════════════════════════
+//   TAG LISTS
+// ══════════════════════════════════════════════
+const TAG_KEYS = ['cities','areas','services','shoot_types','budgets','sources','statuses','substatuses'];
+
+function renderTags(k) {
+  const list = getList(k);
+  const el = document.getElementById('tags-' + k);
+  const badge = document.getElementById('badge-' + k);
+  if (badge) badge.textContent = list.length;
+  el.innerHTML = list.length === 0
+    ? '<span class="tag-empty">Koi item nahi — neeche add karein</span>'
+    : list.map((item, i) => `
+        <div class="tag">
+          ${escHtml(item)}
+          <button class="tag-del" title="Delete" onclick="deleteItem('${k}',${i})">✕</button>
+        </div>`).join('');
+}
+
+function addItem(k) {
+  const input = document.getElementById('input-' + k);
+  const val = input.value.trim();
+  if (!val) { showToast('Kuch likhein pehle!', true); return; }
+  const list = getList(k);
+  if (list.includes(val)) { showToast('Ye item already hai!', true); return; }
+  list.push(val);
+  save(k, list);
+  renderTags(k);
+  input.value = '';
+  input.focus();
+  showToast('✓ "' + val + '" add ho gaya');
+}
+
+function deleteItem(k, i) {
+  const list = getList(k);
+  const removed = list[i];
+  list.splice(i, 1);
+  save(k, list);
+  renderTags(k);
+  showToast('🗑 "' + removed + '" delete ho gaya');
+}
+
+function handleEnter(e, k) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (['gst','advance'].includes(k)) addOption(k);
+    else addItem(k);
+  }
+}
+
+function resetToDefault(k) {
+  if (!confirm(`"${k}" ko default values par reset karein?`)) return;
+  save(k, [...DEFAULTS[k]]);
+  renderTags(k);
+  showToast('↩ Reset to default');
+}
+
+// ══════════════════════════════════════════════
+//   COMPANY INFO
+// ══════════════════════════════════════════════
+function loadCompany() {
+  const co = load('company') || {...DEFAULTS.company};
+  document.getElementById('co_name').value        = co.name || '';
+  document.getElementById('co_whatsapp').value    = co.whatsapp || '';
+  document.getElementById('co_email').value       = co.email || '';
+  document.getElementById('co_website').value     = co.website || '';
+  document.getElementById('co_gst').value         = co.gst || '';
+  document.getElementById('co_prepared_by').value = co.prepared_by || '';
+  document.getElementById('co_terms').value       = co.terms || '';
+}
+
+function saveCompany() {
+  const co = {
+    name:        document.getElementById('co_name').value.trim(),
+    whatsapp:    document.getElementById('co_whatsapp').value.trim(),
+    email:       document.getElementById('co_email').value.trim(),
+    website:     document.getElementById('co_website').value.trim(),
+    gst:         document.getElementById('co_gst').value.trim(),
+    prepared_by: document.getElementById('co_prepared_by').value.trim(),
+    terms:       document.getElementById('co_terms').value.trim(),
+  };
+  save('company', co);
+  showToast('✓ Company info saved!');
+}
+
+// ══════════════════════════════════════════════
+//   QUOTATION SETTINGS
+// ══════════════════════════════════════════════
+function renderQuotation() {
+  const gstList = getGST();
+  const advList = getAdvance();
+  const qCfg = load('quotation') || {...DEFAULTS.quotation};
+
+  // GST options
+  const gstEl = document.getElementById('opts-gst');
+  gstEl.innerHTML = gstList.map((v,i) => `
+    <div class="option-item">
+      <span>${v}%</span>
+      <button class="opt-del" onclick="deleteOption('gst',${i})">✕</button>
+    </div>`).join('');
+
+  // Advance options
+  const advEl = document.getElementById('opts-advance');
+  advEl.innerHTML = advList.map((v,i) => `
+    <div class="option-item">
+      <span>${v}%</span>
+      <button class="opt-del" onclick="deleteOption('advance',${i})">✕</button>
+    </div>`).join('');
+
+  // Default selects
+  const defGst = document.getElementById('def_gst');
+  const defAdv = document.getElementById('def_advance');
+  defGst.innerHTML = gstList.map(v => `<option value="${v}" ${v==qCfg.def_gst?'selected':''}>${v}%</option>`).join('');
+  defAdv.innerHTML = advList.map(v => `<option value="${v}" ${v==qCfg.def_advance?'selected':''}>${v}%</option>`).join('');
+}
+
+function addOption(k) {
+  const input = document.getElementById('input-' + k);
+  const val = parseFloat(input.value);
+  if (isNaN(val) || val < 0 || val > 100) { showToast('Valid % enter karein (0-100)', true); return; }
+  const list = k === 'gst' ? getGST() : getAdvance();
+  if (list.includes(val)) { showToast('Ye option already hai!', true); return; }
+  list.push(val);
+  list.sort((a,b) => a-b);
+  save(k, list);
+  renderQuotation();
+  input.value = '';
+  showToast('✓ ' + val + '% add ho gaya');
+}
+
+function deleteOption(k, i) {
+  const list = k === 'gst' ? getGST() : getAdvance();
+  list.splice(i, 1);
+  save(k, list);
+  renderQuotation();
+  showToast('🗑 Option delete ho gaya');
+}
+
+function saveQuotation() {
+  const qCfg = {
+    def_gst:     parseFloat(document.getElementById('def_gst').value),
+    def_advance: parseFloat(document.getElementById('def_advance').value),
+  };
+  save('quotation', qCfg);
+  showToast('✓ Quotation settings saved!');
+}
+
+// ══════════════════════════════════════════════
+//   EXPORT / IMPORT / RESET
+// ══════════════════════════════════════════════
+function exportConfig() {
+  const cfg = {};
+  [...TAG_KEYS, 'gst', 'advance'].forEach(k => { cfg[k] = load(k) || DEFAULTS[k]; });
+  cfg.company   = load('company')   || DEFAULTS.company;
+  cfg.quotation = load('quotation') || DEFAULTS.quotation;
+  const blob = new Blob([JSON.stringify(cfg, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 's2dio-config-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showToast('⬇ Config downloaded!');
+}
+
+function importConfig() {
+  const file = document.getElementById('import-file').files[0];
+  if (!file) { showToast('Pehle file select karein', true); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const cfg = JSON.parse(e.target.result);
+      [...TAG_KEYS, 'gst', 'advance'].forEach(k => { if (cfg[k]) save(k, cfg[k]); });
+      if (cfg.company)   save('company', cfg.company);
+      if (cfg.quotation) save('quotation', cfg.quotation);
+      initAll();
+      showToast('✓ Config import ho gaya!');
+    } catch {
+      showToast('Invalid JSON file!', true);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Saari settings delete hongi aur default values wapas aayengi. Continue?')) return;
+  [...TAG_KEYS, 'gst', 'advance', 'company', 'quotation'].forEach(k => localStorage.removeItem(KEY(k)));
+  initAll();
+  showToast('↩ All settings reset to default');
+}
+
+// ══════════════════════════════════════════════
+//   TOAST
+// ══════════════════════════════════════════════
+let toastTimer;
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ''; }, 2500);
+}
+
+// ══════════════════════════════════════════════
+//   UTILS
+// ══════════════════════════════════════════════
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════
+//   INIT
+// ══════════════════════════════════════════════
+function initAll() {
+  TAG_KEYS.forEach(k => renderTags(k));
+  loadCompany();
+}
+
+initAll();
+</script>
+</body>
+</html>
