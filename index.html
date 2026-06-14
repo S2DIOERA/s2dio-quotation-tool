@@ -520,6 +520,33 @@ async function saveInquiry(){
     if(data.error){toast('Error: '+data.error.message);return;}
     document.getElementById('inq-success').classList.add('show');
     toast('Lead saved to Airtable!');
+    // CRM SYNC
+try {
+  const existing = JSON.parse(localStorage.getItem('s2e_s2_b') || '[]');
+  const n = new Date();
+  const newLead = {
+    id: 'b' + Date.now(),
+    bookingNo: 'S2E-' + n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(existing.length+1).padStart(3,'0'),
+    clientName:  document.getElementById('i-cn')?.value || '',
+    clientPhone: document.getElementById('i-cp')?.value || '',
+    clientEmail: document.getElementById('i-ce')?.value || '',
+    service:     [...document.querySelectorAll('#svc-chips .chip.sel')].map(c=>c.dataset.val||c.textContent).join(', '),
+    city:        document.getElementById('i-city')?.value || '',
+    shootDate:   document.getElementById('i-date')?.value || '',
+    source:      document.getElementById('i-src')?.value || 'Instagram',
+    status: 'New Inquiry', priority: 'Medium',
+    clientBudget:0, quotedAmount:0, vendorCost:0,
+    platformFee:0, platformMargin:0,
+    advancePaid:0, advanceVendor:0,
+    totalCollected:0, totalPaidVendor:0,
+    comments:[], deliverables:[], review:null,
+    quoteItems:[], followUps:[], googleReviewLink:'',
+    advancePct:30, createdAt: n.toISOString().split('T')[0]
+  };
+  existing.push(newLead);
+  localStorage.setItem('s2e_s2_b', JSON.stringify(existing));
+} catch(e) {}
+// END CRM SYNC
     toast('Lead saved to Airtable!');
 // ── CRM SYNC ──────────────────────────────
 try {
