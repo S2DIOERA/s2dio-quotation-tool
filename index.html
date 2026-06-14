@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <!-- ═══ S2DIO CONFIG (settings.html se sync hota hai) ═══ -->
+</a>
 <script>
 const S2DIO_CFG = (function(){
   const K = k => 's2dio_cfg_' + k;
@@ -141,7 +142,9 @@ table.sv input:focus{outline:none;border-color:#d0d0d0;background:#fff}
   <h1>S2DIO ERA — CRM Tool</h1>
   <div class="topbar-right">
     <span>Team Internal Tool &nbsp;|&nbsp; s2dioera.com</span>
-    <a href="settings.html" class="settings-link">⚙ Settings</a>
+    <a href="settings.html" class="settings-link">⚙ Settings</a><a href="crm.html" style="background:#378ADD;color:#fff;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;margin-left:8px;">
+  📊 Full CRM
+</a>
   </div>
 </div>
 
@@ -517,6 +520,34 @@ async function saveInquiry(){
     if(data.error){toast('Error: '+data.error.message);return;}
     document.getElementById('inq-success').classList.add('show');
     toast('Lead saved to Airtable!');
+    toast('Lead saved to Airtable!');
+// ── CRM SYNC ──────────────────────────────
+try {
+  const existing = JSON.parse(localStorage.getItem('s2e_s2_b') || '[]');
+  const n = new Date();
+  const mo = String(n.getMonth()+1).padStart(2,'0');
+  const newLead = {
+    id: 'b' + Date.now(),
+    bookingNo: `S2E-${n.getFullYear()}-${mo}-${String(existing.length+1).padStart(3,'0')}`,
+    clientName:  document.getElementById('i-cn')?.value || '',
+    clientPhone: document.getElementById('i-cp')?.value || '',
+    clientEmail: document.getElementById('i-ce')?.value || '',
+    service:     [...document.querySelectorAll('#svc-chips .chip.sel')].map(c=>c.dataset.val||c.textContent).join(', '),
+    city:        document.getElementById('i-city')?.value || '',
+    shootDate:   document.getElementById('i-date')?.value || '',
+    source:      document.getElementById('i-src')?.value || 'Instagram',
+    status: 'New Inquiry', priority: 'Medium',
+    clientBudget:0, quotedAmount:0, vendorCost:0, platformFee:0, platformMargin:0,
+    advancePaid:0, advanceVendor:0, totalCollected:0, totalPaidVendor:0,
+    comments:[], deliverables:[], review:null, quoteItems:[], followUps:[],
+    googleReviewLink:'', advancePct:30,
+    createdAt: n.toISOString().split('T')[0]
+  };
+  existing.push(newLead);
+  localStorage.setItem('s2e_s2_b', JSON.stringify(existing));
+} catch(e){ console.warn('CRM sync:', e); }
+// ── END CRM SYNC ──────────────────────────
+loadLeads(token);
     loadLeads(token);
     setTimeout(()=>document.getElementById('inq-success').classList.remove('show'),4000);
   }catch(e){toast('Connection error!');}
