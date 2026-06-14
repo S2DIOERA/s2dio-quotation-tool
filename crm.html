@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>S2DIO ERA — CRM v2</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f9fa;color:#111;min-height:100vh}
@@ -886,7 +885,7 @@ function renderLeadDetail(){
       <div class="stat-chip"><div class="sl">Delivery</div><div class="sv" style="color:${b.deliveryDue&&dfn(b.deliveryDue)<0?'#EF4444':'inherit'}">${b.deliveryDue||'TBD'}</div></div>
     </div>
     <div class="ld-tabs">
-      ${[['timeline','🕐 Timeline'],['quotation','📋 Quote'],['payments','💰 Payments'],['deliverables','📁 Files'],['review','⭐ Review']].map(([t,lbl])=>`<button class="ld-tab ${S.leadTab===t?'active':''}" onclick="S.leadTab='${t}';renderLeadDetail()">${lbl}</button>`).join('')}
+      ${[['timeline','🕐 Timeline'],['quotation','📋 Quote'],['payments','💰 Payments'],['deliverables','📁 Files'],['review','⭐ Review'],['postjob','📢 Post Job']].map(([t,lbl])=>`<button class="ld-tab ${S.leadTab===t?'active':''}" onclick="S.leadTab='${t}';renderLeadDetail()">${lbl}</button>`).join('')}
     </div>
     <div class="ld-body" id="ld-body"></div>`;
 
@@ -901,6 +900,7 @@ function renderLeadBody(b,v){
   else if(S.leadTab==='payments') el.innerHTML=ldPayments(b);
   else if(S.leadTab==='deliverables') el.innerHTML=ldDeliverables(b);
   else if(S.leadTab==='review') el.innerHTML=ldReview(b);
+  else if(S.leadTab==='postjob') el.innerHTML=ldPostJob(b);
 }
 
 function ldTimeline(b){
@@ -1301,6 +1301,83 @@ let selStars=3;
 function setStars(n){selStars=n;document.querySelectorAll('#star-row button').forEach((b,i)=>{b.style.opacity=i<n?1:0.3;});}
 function saveReview(bid){const rv={rating:selStars,text:g('rv-text')?.value||'',platform:gv('rv-plat')||'Google',receivedAt:gv('rv-date')||today()};updBField(bid,'review',rv);setTimeout(()=>renderLeadDetail(),50);}
 
+
+function ldPostJob(b){
+  const jobMsg=()=>{
+    const jt=document.getElementById('pj-jt')?.value||b.service||'';
+    const loc=document.getElementById('pj-loc')?.value||b.city||'';
+    const dt=document.getElementById('pj-dt')?.value||b.shootDate||'TBD';
+    const dur=document.getElementById('pj-dur')?.value||'';
+    const ph=document.getElementById('pj-ph')?.value||'';
+    const vh=document.getElementById('pj-vh')?.value||'';
+    const ch=document.getElementById('pj-ch')?.value||'';
+    const dr=document.getElementById('pj-dr')?.value||'Optional';
+    const pkg=document.getElementById('pj-pkg')?.value||'';
+    const bgt=document.getElementById('pj-bgt')?.value||'Need to share Budget';
+    const trvl=document.getElementById('pj-trvl')?.value||'Not Included';
+    const spec=document.getElementById('pj-spec')?.value||'';
+    const ddl=document.getElementById('pj-ddl')?.value||'Today by 8pm';
+    const contact=document.getElementById('pj-con')?.value||'Your Name + Number + Work Link';
+    const crew=[ph?`${ph} Photographer(s)`:'',vh?`${vh} Videographer(s)`:'',ch?`${ch} Cinematographer(s)`:''].filter(Boolean).join(', ')||'TBD';
+    return `🎬 SHOOT AVAILABLE — ${dt} | ${loc}\n\n📋 Job: ${jt}\n📍 Location: ${loc}\n⏰ Duration: ${dur||'TBD'}\n👥 Need: ${crew}\n🚁 Drone: ${dr}\n📦 Package: ${pkg||'TBD'}\n💰 Rate: ₹${bgt}\n🚌 Travel: ${trvl}\n✨ Special: ${spec||'NA'}\n✅ Confirm by: ${ddl}\n📞 Respond to: ${contact}\n\nReply YES to confirm availability. First confirmed gets the job!\n\nPlease share: Your full name | Service you can provide | Any questions\n#PhotographyJob #FreelanceWork`;
+  };
+  const emailMsg=()=>{
+    const cn=b.clientName||'',ph=b.clientPhone||'',svc=b.service||'',city=b.city||'',dt=b.shootDate||'TBD';
+    return `Subject: Booking Confirmation — S2DIO ERA\n\nDear ${cn},\n\nThank you for reaching out to S2DIO ERA! 🎬\n\nWe have received your inquiry and are delighted to assist you.\n\n📋 Lead ID: ${b.bookingNo}\n📸 Service: ${svc}\n📍 Location: ${city}\n📅 Shoot Date: ${dt}\n\nOur team is reviewing your requirements and will share a detailed quotation within 24 hours.\n\nFor any queries, feel free to WhatsApp us at your convenience.\n\nWarm regards,\nTeam S2DIO ERA\ns2dioera.com`;
+  };
+  return `<div>
+    <div class="grid2" style="gap:16px;align-items:start">
+      <div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:10px">📢 Creator Group Job Post</div>
+        <div class="card">
+          <div class="grid2">
+            <div class="frow"><label>Job Type</label><input id="pj-jt" value="${esc(b.service||'')}"></div>
+            <div class="frow"><label>Location / Venue</label><input id="pj-loc" value="${esc(b.city||'')}"></div>
+            <div class="frow"><label>Shoot Date</label><input id="pj-dt" value="${esc(b.shootDate||'')}"></div>
+            <div class="frow"><label>Duration</label><input id="pj-dur" placeholder="e.g. 4 hours / Full Day"></div>
+            <div class="frow"><label>No. of Photographers</label><input id="pj-ph" placeholder="0"></div>
+            <div class="frow"><label>No. of Videographers</label><input id="pj-vh" placeholder="0"></div>
+            <div class="frow"><label>No. of Cinematographers</label><input id="pj-ch" placeholder="0"></div>
+            <div class="frow"><label>Drone Required?</label><select id="pj-dr"><option>Optional</option><option>Yes — Required</option><option>No</option></select></div>
+            <div class="frow"><label>Package / Deliverables</label><input id="pj-pkg" placeholder="Raw Videos / Edited Photos"></div>
+            <div class="frow"><label>Budget / Rate (₹)</label><input id="pj-bgt" placeholder="Need to share Budget"></div>
+            <div class="frow"><label>Travel / Accommodation</label><select id="pj-trvl"><option>Not Included</option><option>Included</option><option>Reimbursable</option></select></div>
+            <div class="frow"><label>Deadline to Confirm</label><input id="pj-ddl" placeholder="Today by 8pm"></div>
+          </div>
+          <div class="frow"><label>Special Requirements</label><textarea id="pj-spec" rows="2" placeholder="Gimbal experience, brand shoot, etc."></textarea></div>
+          <div class="frow"><label>Contact (respond to)</label><input id="pj-con" placeholder="Your Name + Number + Work Link"></div>
+          <button class="btn btn-wa" onclick="const msg=document.getElementById('pj-preview');msg.textContent=arguments[0]||''" style="display:none">x</button>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="btn btn-wa" onclick="pjUpdate();pjCopy()">📱 Copy WA Group Message</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:10px">📧 Client Email Draft</div>
+        <div class="card">
+          <div style="background:#f9fafb;border-radius:8px;padding:12px;font-size:12px;white-space:pre-wrap;line-height:1.7;max-height:200px;overflow-y:auto;margin-bottom:8px">${esc(emailMsg())}</div>
+          <button class="btn btn-primary btn-sm" onclick="navigator.clipboard.writeText(\`${emailMsg().replace(/`/g,"'")}\`).then(()=>alert('Email draft copied! Paste in Gmail 📧'))">📋 Copy Email Draft</button>
+        </div>
+        <div style="margin-top:12px;font-size:13px;font-weight:500;margin-bottom:10px">📱 WA Preview</div>
+        <div class="card">
+          <div id="pj-preview-text" style="background:#DCF8C6;border-radius:8px;padding:12px;font-size:12px;white-space:pre-wrap;line-height:1.7;max-height:220px;overflow-y:auto;font-family:inherit">Fill the form on the left and click Copy to generate message...</div>
+          <textarea id="pj-out" style="display:none"></textarea>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function(){
+        function upd(){
+          const jt=document.getElementById('pj-jt')?.value||'',loc=document.getElementById('pj-loc')?.value||'',dt=document.getElementById('pj-dt')?.value||'TBD',dur=document.getElementById('pj-dur')?.value||'',ph=document.getElementById('pj-ph')?.value||'',vh=document.getElementById('pj-vh')?.value||'',ch=document.getElementById('pj-ch')?.value||'',dr=document.getElementById('pj-dr')?.value||'Optional',pkg=document.getElementById('pj-pkg')?.value||'',bgt=document.getElementById('pj-bgt')?.value||'Need to share Budget',trvl=document.getElementById('pj-trvl')?.value||'Not Included',spec=document.getElementById('pj-spec')?.value||'',ddl=document.getElementById('pj-ddl')?.value||'Today by 8pm',con=document.getElementById('pj-con')?.value||'Your Name + Number + Work Link';
+          const crew=[ph?ph+' Photographer(s)':'',vh?vh+' Videographer(s)':'',ch?ch+' Cinematographer(s)':''].filter(Boolean).join(', ')||'TBD';
+          const msg='🎬 SHOOT AVAILABLE — '+dt+' | '+loc+'\n\n📋 Job: '+jt+'\n📍 Location: '+loc+'\n⏰ Duration: '+(dur||'TBD')+'\n👥 Need: '+crew+'\n🚁 Drone: '+dr+'\n📦 Package: '+(pkg||'TBD')+'\n💰 Rate: ₹'+bgt+'\n🚌 Travel: '+trvl+'\n✨ Special: '+(spec||'NA')+'\n✅ Confirm by: '+ddl+'\n📞 Respond to: '+con+'\n\nReply YES to confirm availability. First confirmed gets the job!\n\nPlease share: Your full name | Service you can provide | Any questions\n#PhotographyJob #FreelanceWork';
+          const el=document.getElementById('pj-preview-text');if(el)el.textContent=msg;
+          const out=document.getElementById('pj-out');if(out)out.value=msg;
+        }
+        setTimeout(()=>{document.querySelectorAll('[id^="pj-"]').forEach(el=>el.addEventListener('input',upd));upd();},100);
+  </div>`;
+}
+
 /* ═══ CHARTS ═══ */
 const CC=['#378ADD','#1D9E75','#BA7517','#7F77DD','#D85A30','#E24B4A','#0F6E56','#533F2B','#B45309','#7C3AED'];
 function mkChart(id,type,labels,datasets,opts){
@@ -1341,10 +1418,31 @@ function renderCharts(){
   if(g('ch-inv'))mkChart('ch-inv','line',md.map(d=>d.month),[{label:'GMV',data:md.map(d=>d.gmv),borderColor:'#378ADD',tension:0.4,fill:false},{label:'Net Revenue',data:md.map(d=>d.margin),borderColor:'#10B981',tension:0.4,fill:false},{label:'Net Profit',data:md.map(d=>d.netProfit),borderColor:'#1D9E75',tension:0.4,borderDash:[5,5],fill:false}],{legend:true,money:true});
 }
 
+
+function pjUpdate(){
+  const gv=id=>document.getElementById(id)?.value||'';
+  const jt=gv('pj-jt'),loc=gv('pj-loc'),dt=gv('pj-dt')||'TBD',dur=gv('pj-dur'),
+        ph=gv('pj-ph'),vh=gv('pj-vh'),ch=gv('pj-ch'),
+        dr=gv('pj-dr')||'Optional',pkg=gv('pj-pkg'),bgt=gv('pj-bgt')||'Need to share Budget',
+        trvl=gv('pj-trvl')||'Not Included',spec=gv('pj-spec'),
+        ddl=gv('pj-ddl')||'Today by 8pm',con=gv('pj-con')||'Your Name + Number + Work Link';
+  const crew=[ph?ph+' Photographer(s)':'',vh?vh+' Videographer(s)':'',ch?ch+' Cinematographer(s)':''].filter(Boolean).join(', ')||'TBD';
+  const msg='🎬 SHOOT AVAILABLE — '+dt+' | '+loc+'\n\n📋 Job: '+jt+'\n📍 Location: '+loc+'\n⏰ Duration: '+(dur||'TBD')+'\n👥 Need: '+crew+'\n🚁 Drone: '+dr+'\n📦 Package: '+(pkg||'TBD')+'\n💰 Rate: \u20b9'+bgt+'\n🚌 Travel: '+trvl+'\n✨ Special: '+(spec||'NA')+'\n✅ Confirm by: '+ddl+'\n📞 Respond to: '+con+'\n\nReply YES to confirm availability. First confirmed gets the job!\n\nPlease share: Your full name | Service | Any questions\n#PhotographyJob #FreelanceWork';
+  const el=document.getElementById('pj-preview-text');if(el)el.textContent=msg;
+  const out=document.getElementById('pj-out');if(out)out.value=msg;
+}
+function pjCopy(){
+  const msg=document.getElementById('pj-out')?.value||document.getElementById('pj-preview-text')?.textContent||'';
+  if(!msg||msg.includes('Fill the form'))return alert('Fill the form fields first!');
+  navigator.clipboard.writeText(msg).then(()=>alert('Copied! Paste in WhatsApp group 📱'));
+}
+
 /* ═══ INIT ═══ */
 document.addEventListener('DOMContentLoaded',()=>{
   initData();
   render();
+  // pj fields live update
+  document.addEventListener('input', e=>{if(e.target?.id?.startsWith('pj-'))pjUpdate();});
 });
 
 </script>
