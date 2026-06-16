@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>S2DIO ERA — Quick Enquiry</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#0f0f0f 0%,#1a1a2e 100%);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:#111;color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222}
+.topbar h1{font-size:16px;font-weight:700;letter-spacing:0.5px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar a{color:#888;text-decoration:none;font-size:11px;padding:4px 10px;border:1px solid #333;border-radius:6px;transition:all .15s}
+.topbar a:hover{background:#222;color:#fff}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.card{background:#fff;border-radius:16px;width:100%;max-width:420px;padding:32px 28px;box-shadow:0 25px 80px rgba(0,0,0,0.6)}
+.logo-area{text-align:center;margin-bottom:28px}
+.logo-area .brand{font-size:22px;font-weight:800;color:#111;letter-spacing:-0.5px}
+.logo-area .tagline{font-size:12px;color:#888;margin-top:4px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.field input,.field select{width:100%;padding:12px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:15px;font-family:inherit;color:#111;background:#fff;transition:border .15s,box-shadow .15s}
+.field input:focus,.field select:focus{outline:none;border-color:#378ADD;box-shadow:0 0 0 3px rgba(55,138,221,0.15)}
+.field input::placeholder{color:#bbb}
+.required{color:#EF4444}
+.submit-btn{width:100%;padding:14px;background:#378ADD;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:4px}
+.submit-btn:hover{background:#2563eb;transform:translateY(-1px);box-shadow:0 4px 15px rgba(55,138,221,0.4)}
+.submit-btn:active{transform:translateY(0)}
+.submit-btn:disabled{background:#94a3b8;cursor:not-allowed;transform:none;box-shadow:none}
+.success-box{display:none;text-align:center;padding:32px 20px}
+.success-box .tick{font-size:56px;margin-bottom:16px}
+.success-box h2{font-size:22px;font-weight:700;color:#10B981;margin-bottom:8px}
+.success-box p{font-size:14px;color:#666;line-height:1.6;margin-bottom:20px}
+.success-box .lead-id{background:#f0fdf4;border:1px solid #86efac;color:#166534;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;display:inline-block;margin-bottom:20px}
+.success-box .wa-btn{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;font-family:inherit;border:none;cursor:pointer}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#EF4444;color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+.at-hint{font-size:10px;color:#bbb;text-align:center;margin-top:12px}
+.at-hint a{color:#888;text-decoration:none}
+.interest-opt{padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;cursor:pointer;font-size:14px;font-family:inherit;transition:all .15s;background:#fff;text-align:left;width:100%;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.interest-opt.sel{border-color:#378ADD;background:#EFF6FF;color:#1d4ed8;font-weight:600}
+.interest-opt:hover{border-color:#93c5fd;background:#f0f9ff}
+.interest-opts-wrap{margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>S2DIO ERA</h1>
+  <div class="topbar-right">
+    <a href="crm.html">🏢 CRM →</a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="card">
+
+    <!-- FORM VIEW -->
+    <div id="form-view">
+      <div class="logo-area">
+        <div class="brand">📸 S2DIO ERA</div>
+        <div class="tagline">India's Creator Marketplace — Book a Shoot or Join Us</div>
+      </div>
+
+      <div class="field">
+        <label>Your Name <span class="required">*</span></label>
+        <input id="f-name" placeholder="Rahul Sharma" autocomplete="name"/>
+      </div>
+
+      <div class="field">
+        <label>WhatsApp Number <span class="required">*</span></label>
+        <input id="f-phone" placeholder="+91 98765 43210" type="tel" autocomplete="tel"/>
+      </div>
+
+      <div class="field">
+        <label>I want to <span class="required">*</span></label>
+        <div class="interest-opts-wrap" id="interest-opts">
+          <button class="interest-opt" data-val="Book Photographer" onclick="selectInterest(this)">📸 Book a Photographer / Videographer</button>
+          <button class="interest-opt" data-val="Book Studio" onclick="selectInterest(this)">🏠 Book a Studio</button>
+          <button class="interest-opt" data-val="Register with us" onclick="selectInterest(this)">🤝 Register with S2DIO ERA (Creator / Studio)</button>
+        </div>
+        <input type="hidden" id="f-interest"/>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">Submit Enquiry →</button>
+      <div class="at-hint">Powered by S2DIO ERA · <a href="crm.html">Team Login</a></div>
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div id="success-view" class="success-box">
+      <div class="tick">✅</div>
+      <h2>You're In!</h2>
+      <p>We've received your enquiry and will get back to you on WhatsApp within <strong>2 hours</strong>.</p>
+      <div class="lead-id" id="success-lead-id"></div>
+      <br/>
+      <button class="wa-btn" onclick="openNewEnquiry()">📋 New Enquiry</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const AT_BASE='appfJtOaBCSpLQ1GN';
+const AT_TABLE='Client Leads';
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function today(){return new Date().toISOString().split('T')[0]}
+function nextLeadNo(){
+  try{
+    const bookings=JSON.parse(localStorage.getItem('s2e_s2_b')||'[]');
+    const n=new Date(),y=n.getFullYear(),m=String(n.getMonth()+1).padStart(2,'0');
+    const pfx='S2E-'+y+'-'+m+'-';
+    const c=bookings.filter(b=>b.bookingNo&&b.bookingNo.startsWith(pfx)).length;
+    return pfx+String(c+1).padStart(3,'0');
+  }catch(e){return 'S2E-'+Date.now();}
+}
+function showToast(msg,color){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=color||'#EF4444';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function selectInterest(btn){
+  document.querySelectorAll('.interest-opt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('f-interest').value=btn.dataset.val;
+}
+
+function submitForm(){
+  const name=(document.getElementById('f-name').value||'').trim();
+  const phone=(document.getElementById('f-phone').value||'').trim();
+  const interest=(document.getElementById('f-interest').value||'').trim();
+
+  if(!name){showToast('Name required hai!');document.getElementById('f-name').focus();return;}
+  if(!phone||phone.replace(/\D/g,'').length<10){showToast('Valid phone number dalo!');document.getElementById('f-phone').focus();return;}
+  if(!interest){showToast('Kya karna hai select karo!');return;}
+
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.textContent='Saving...';
+
+  const leadNo=nextLeadNo();
+  const service=interest==='Book Studio'?'Studio Rental':interest==='Register with us'?'Registration':interest;
+
+  const lead={
+    id:uid(),
+    bookingNo:leadNo,
+    status:'New',
+    substatus:'—',
+    priority:'Medium',
+    clientName:name,
+    clientPhone:phone,
+    clientEmail:'',
+    service:service,
+    city:'',
+    source:'Website',
+    vendorId:'',
+    shootDate:'',
+    deliveryDue:'',
+    clientBudget:0,quotedAmount:0,
+    vendorCost:0,platformFee:0,
+    advancePaid:0,advanceVendor:0,
+    totalCollected:0,totalPaidVendor:0,
+    platformMargin:0,
+    remarks:'Interest: '+interest,
+    comments:[],deliverables:[],
+    review:null,quoteItems:[],
+    followUps:[],googleReviewLink:'',
+    advancePct:30,
+    createdAt:today()
+  };
+
+  // Save to localStorage
+  try{
+    const existing=JSON.parse(localStorage.getItem('s2e_s2_b')||'[]');
+    existing.push(lead);
+    localStorage.setItem('s2e_s2_b',JSON.stringify(existing));
+  }catch(e){console.error('LocalStorage error',e);}
+
+  // Airtable sync
+  const atToken=localStorage.getItem('s2e_at')||'';
+  const syncAirtable=atToken?fetch('https://api.airtable.com/v0/'+AT_BASE+'/'+encodeURIComponent(AT_TABLE),{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+atToken,'Content-Type':'application/json'},
+    body:JSON.stringify({fields:{
+      'Lead ID':leadNo,
+      'Client Name':name,
+      'Phone':phone,
+      'Service':service,
+      'Status':'New',
+      'Priority':'Medium',
+      'Source':'Website',
+      'Quoted Amount':0
+    }})
+  }).catch(()=>{}):Promise.resolve();
+
+  syncAirtable.then(()=>{
+    document.getElementById('success-lead-id').textContent='Lead ID: '+leadNo;
+    document.getElementById('form-view').style.display='none';
+    document.getElementById('success-view').style.display='block';
+    btn.disabled=false;btn.textContent='Submit Enquiry →';
+  });
+}
+
+function openNewEnquiry(){
+  document.getElementById('f-name').value='';
+  document.getElementById('f-phone').value='';
+  document.getElementById('f-interest').value='';
+  document.querySelectorAll('.interest-opt').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('form-view').style.display='block';
+  document.getElementById('success-view').style.display='none';
+}
+</script>
+</body>
+</html>
